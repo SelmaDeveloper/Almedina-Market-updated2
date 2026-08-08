@@ -304,12 +304,13 @@ const StorefrontContent: React.FC = () => {
           <div className="space-y-2">
             <h3 className="font-bold font-serif text-[#1A1A1A]">Store Location</h3>
             <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0" />{BRAND.location}</p>
-            <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 shrink-0" />Calls: {BRAND.callHours}</p>
+            <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 shrink-0" />Working Hours: {BRAND.workingHours}</p>
             <a href={`tel:${BRAND.phoneTel}`} className="text-[#1A1A1A]/70 flex items-center gap-1.5 hover:text-emerald-700 transition-colors"><Phone className="w-3.5 h-3.5 shrink-0" />{BRAND.phone}</a>
-            <a href={`mailto:${BRAND.email}`} className="text-[#1A1A1A]/70 flex items-center gap-1.5 hover:text-emerald-700 transition-colors break-all"><Mail className="w-3.5 h-3.5 shrink-0" />{BRAND.email}</a>
+            <a href={`https://mail.google.com`} target="_blank" rel="noopener noreferrer" className="text-[#1A1A1A]/70 flex items-center gap-1.5 hover:text-emerald-700 transition-colors break-all"><Mail className="w-3.5 h-3.5 shrink-0" />{BRAND.email}</a>
           </div>
           <div className="space-y-2">
             <h3 className="font-bold font-serif text-[#1A1A1A]">Service Terms</h3>
+            <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 shrink-0" />Working Hours: {BRAND.workingHours}</p>
             <p className="text-[#1A1A1A]/70">Max Delivery: 6.0 km</p>
             <p className="text-[#1A1A1A]/70">Min Delivery Subtotal: 1,000 ETB</p>
           </div>
@@ -515,17 +516,27 @@ const StorefrontContent: React.FC = () => {
 
             {pageModal === 'about' && (
               <div className="space-y-4 text-xs leading-relaxed text-[#1A1A1A]/80">
+                <div className="bg-gradient-to-br from-emerald-50 to-white p-5 rounded-xl border border-emerald-200 space-y-2">
+                  <h3 className="font-bold text-sm text-emerald-900 font-serif">Our Promise</h3>
+                  <p className="text-[#1A1A1A]/80">At {BRAND.name}, nestled in the heart of Bethel, Addis Ababa, we believe grocery shopping should feel personal. That's why every product on our shelves is hand-picked for quality, authenticity, and value — from premium imported dates and aromatic Arabic coffee to everyday cooking essentials your family trusts.</p>
+                  <p className="text-[#1A1A1A]/80">Whether you prefer the convenience of doorstep delivery or a quick in-store pickup, we make it simple, fast, and reliable. <strong>Your kitchen deserves the best — and we deliver it.</strong></p>
+                </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                  <h3 className="font-bold text-sm text-[#1A1A1A] font-serif">Our Promise</h3>
-                  <p>{BRAND.name} operates as a single-vendor retail store in Bethel, Addis Ababa. We bring you a carefully curated selection of high-quality groceries.</p>
+                  <h3 className="font-bold text-sm text-[#1A1A1A] font-serif">Why Shop With Us?</h3>
+                  <ul className="space-y-1.5 pl-4 list-disc">
+                    <li><strong>Curated Quality</strong> — every item meets our personal standard before it reaches you.</li>
+                    <li><strong>Flexible Fulfillment</strong> — doorstep delivery within 6 km or free pickup at our Bethel store.</li>
+                    <li><strong>Transparent Pricing</strong> — what you see is what you pay, no hidden fees.</li>
+                    <li><strong>Same-Day Returns</strong> — not satisfied? Report it the same day with photo proof for a quick resolution.</li>
+                  </ul>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
                   <h3 className="font-bold text-sm text-[#1A1A1A] font-serif">Delivery Policy</h3>
-                  <p>Delivery is strictly limited to <strong>6.0 km radius</strong>. Orders beyond 6.0 km are restricted to <strong>Free In-Store Pickup</strong>. Minimum delivery subtotal: <strong>1,000 ETB</strong>.</p>
+                  <p>Delivery is strictly limited to a <strong>6.0 km radius</strong> from our Bethel location. Orders beyond 6.0 km are welcome as <strong>Free In-Store Pickup</strong>. Minimum delivery subtotal: <strong>1,000 ETB</strong>.</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
                   <h3 className="font-bold text-sm text-[#1A1A1A] font-serif">Same-Day Return Policy</h3>
-                  <p>Return or replacement requests must be filed on the <strong>same calendar day</strong> as delivery. Photo evidence is mandatory.</p>
+                  <p>Return or replacement requests must be filed on the <strong>same calendar day</strong> as delivery. Photo evidence is mandatory for all returns.</p>
                 </div>
               </div>
             )}
@@ -534,7 +545,7 @@ const StorefrontContent: React.FC = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-white rounded-xl border border-slate-200 text-xs">
                   <a href={`tel:${BRAND.phoneTel}`} className="flex items-center gap-2 text-emerald-700 font-semibold hover:underline"><Phone className="w-4 h-4 shrink-0" />{BRAND.phone}</a>
-                  <a href={`mailto:${BRAND.email}`} className="flex items-center gap-2 text-emerald-700 font-semibold hover:underline break-all"><Mail className="w-4 h-4 shrink-0" />{BRAND.email}</a>
+                  <a href={`https://mail.google.com`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-emerald-700 font-semibold hover:underline break-all"><Mail className="w-4 h-4 shrink-0" />{BRAND.email}</a>
                 </div>
                 <div className="space-y-3">
                   <div><label className="block text-xs font-semibold text-[#1A1A1A] mb-1">Full Name</label><input type="text" placeholder="e.g., Abebe Bikila" value={contactName} onChange={(e) => setContactName(e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-emerald-600" /></div>

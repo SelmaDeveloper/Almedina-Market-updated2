@@ -7,7 +7,6 @@ import {
   ListOrdered,
   User,
   Phone,
-  MapPin,
   Clock,
   LogOut,
   ChevronDown,
@@ -88,13 +87,9 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Top Info Banner */}
       <div className="bg-emerald-900 text-emerald-100 text-[11px] px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800">
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-emerald-300 shrink-0" />
-            <strong className="text-white">Location:</strong>&nbsp;Bethel Main Road, Addis Ababa
-          </span>
           <span className="hidden sm:flex items-center gap-1 text-emerald-200">
             <Clock className="w-3 h-3 text-amber-300 shrink-0" />
-            Calls: 3:00 AM LT – 9:00 PM LT
+            Working Hours: {BRAND.workingHours}
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -241,7 +236,7 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
                     >
                       <User className="w-4 h-4 text-emerald-600" />
-                      Customer Dashboard
+                      Settings
                     </button>
                     <button
                       onClick={() => { setUserMenuOpen(false); onOpenOrderHistory(); }}
@@ -322,7 +317,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="w-full flex items-center gap-3 px-3 py-3 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-colors"
             >
               <User className="w-5 h-5 text-emerald-600" />
-              <span className="font-semibold">Customer Dashboard</span>
+              <span className="font-semibold">Settings</span>
             </button>
 
             <button

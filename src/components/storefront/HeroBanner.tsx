@@ -34,7 +34,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreProducts, onOpe
               <Truck className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
                 <p className="font-bold text-emerald-100">6.0 km Max Delivery</p>
-                <p className="text-[11px] text-slate-300">Fee: 50 ETB base + 15 ETB/km (Min 1,000 ETB)</p>
+                <p className="text-[11px] text-slate-300">Transparent flat-rate pricing</p>
               </div>
             </div>
             <div className="flex items-center gap-2.5 bg-emerald-900/60 p-2.5 rounded-xl border border-emerald-700/50">
@@ -88,8 +88,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onExploreProducts, onOpe
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold text-white">Call Confirmation Hours</p>
-                  <p className="text-slate-400 text-[11px]">{BRAND.callHours}</p>
+                  <p className="font-semibold text-white">Working Hours</p>
+                  <p className="text-slate-400 text-[11px]">{BRAND.workingHours}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">

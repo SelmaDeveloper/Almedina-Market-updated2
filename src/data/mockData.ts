@@ -104,7 +104,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 38,
     isPopular: true,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-2',
@@ -122,7 +122,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.8,
     reviewCount: 29,
     isPopular: true,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-3',
@@ -140,7 +140,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 45,
     isPopular: true,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-4',
@@ -158,7 +158,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.7,
     reviewCount: 22,
     isPopular: false,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-5',
@@ -176,7 +176,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 19,
     isPopular: true,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-6',
@@ -194,7 +194,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.6,
     reviewCount: 15,
     isPopular: false,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-7',
@@ -212,7 +212,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.8,
     reviewCount: 12,
     isPopular: false,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-8',
@@ -230,7 +230,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 31,
     isPopular: true,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-9',
@@ -248,7 +248,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.7,
     reviewCount: 17,
     isPopular: false,
-    isSaudiImport: true,
+    isImported: true,
   },
   {
     id: 'prod-10',
@@ -266,7 +266,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 28,
     isPopular: true,
-    isSaudiImport: true,
+    isImported: true,
   },
 ];
 

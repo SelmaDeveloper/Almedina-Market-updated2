@@ -30,7 +30,7 @@ export const AdminProductManager: React.FC = () => {
   const [image, setImage] = useState('https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&q=80&w=600');
   const [stockCount, setStockCount] = useState<number>(20);
   const [lowStockThreshold, setLowStockThreshold] = useState<number>(5);
-  const [isSaudiImport, setIsSaudiImport] = useState(true);
+  const [isImported, setIsImported] = useState(true);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<CategoryId | 'all'>('all');
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -47,7 +47,7 @@ export const AdminProductManager: React.FC = () => {
     setImage('https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&q=80&w=600');
     setStockCount(20);
     setLowStockThreshold(5);
-    setIsSaudiImport(true);
+    setIsImported(true);
     setErrorMessage(null);
     setModalOpen(true);
   };
@@ -64,7 +64,7 @@ export const AdminProductManager: React.FC = () => {
     setImage(p.image);
     setStockCount(p.stockCount);
     setLowStockThreshold(p.lowStockThreshold);
-    setIsSaudiImport(p.isSaudiImport);
+    setIsImported(p.isImported);
     setErrorMessage(null);
     setModalOpen(true);
   };
@@ -101,7 +101,7 @@ export const AdminProductManager: React.FC = () => {
         stockCount,
         lowStockThreshold,
         isAvailable: stockCount > 0,
-        isSaudiImport,
+        isImported,
       });
     } else {
       addProduct({
@@ -116,7 +116,7 @@ export const AdminProductManager: React.FC = () => {
         stockCount,
         lowStockThreshold,
         isAvailable: stockCount > 0,
-        isSaudiImport,
+        isImported,
       });
     }
 

@@ -388,7 +388,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return firebaseUser.emailVerified;
   };
 
-  const updateAccountSettings = async (updates: { name?: string; phoneNumber?: string }) => {
+  const updateAccountSettings = async (updates: { name?: string; phoneNumber?: string; avatar?: string }) => {
     if (!currentUser) {
       showToast('Please log in to update account settings.', 'warning');
       return;
@@ -404,7 +404,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
-    showToast('Account settings updated.', 'success');
+    showToast('Settings updated.', 'success');
   };
 
   const saveAddress = (address: { label: string; addressText: string; latitude: number; longitude: number; distanceKm: number }) => {
@@ -479,7 +479,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
-    setProducts((prev) => prev.map((p) => p.id === id ? { ...p, ...updates } : p));
+    setProducts((prev) => prev.map((p) => p.id === id ? { ...p, ...updates, isAvailable: updates.stockCount !== undefined ? updates.stockCount > 0 : p.isAvailable } : p));
+    // If stock dropped to 0, flag any cart items holding this product as unavailable
+    if (updates.stockCount !== undefined && updates.stockCount <= 0) {
+      setCart((prev) => prev.map((i) => i.product.id === id ? { ...i, isUnavailableInCart: true } : i));
+    } else if (updates.stockCount !== undefined) {
+      // Stock restored — clear the flag and clamp quantity to new stock
+      setCart((prev) => prev.map((i) => i.product.id === id ? { ...i, isUnavailableInCart: false, quantity: Math.min(i.quantity, updates.stockCount as number) } : i));
+    }
     showToast('Product updated.', 'success');
   };
 
@@ -496,28 +503,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setAuthModalOpen(true);
       return { success: false, message: 'Login required.' };
     }
-    if (!product.isAvailable || product.stockCount <= 0) {
+    // Re-check live stock from the products array (not the stale product snapshot)
+    const live = products.find((p) => p.id === product.id);
+    const stock = live ? live.stockCount : product.stockCount;
+    const available = live ? live.isAvailable && live.stockCount > 0 : product.isAvailable && product.stockCount > 0;
+    if (!available || stock <= 0) {
       showToast(`${product.name} is out of stock.`, 'error');
       return { success: false, message: 'Out of stock.' };
     }
+    const inCart = cart.find((i) => i.product.id === product.id)?.quantity || 0;
+    const remaining = stock - inCart;
+    if (remaining <= 0) {
+      showToast(`You already have all ${stock} ${product.unit} of ${product.name} in your cart.`, 'warning');
+      return { success: false, message: 'Stock limit reached.' };
+    }
+    const addQty = Math.min(quantity, remaining);
     setCart((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
         return prev.map((i) =>
           i.product.id === product.id
-            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stockCount) }
+            ? { ...i, quantity: Math.min(i.quantity + addQty, stock), isUnavailableInCart: false }
             : i
         );
       }
-      return [...prev, { product, quantity: Math.min(quantity, product.stockCount), addedAtPrice: product.priceETB }];
+      return [...prev, { product: live || product, quantity: addQty, addedAtPrice: (live || product).priceETB, isUnavailableInCart: false }];
     });
-    showToast(`${product.name} added to cart.`, 'success');
+    if (addQty < quantity) {
+      showToast(`Added ${addQty} of ${product.name}. Only ${remaining} left in stock.`, 'warning');
+    } else if (stock - inCart - addQty <= (live?.lowStockThreshold || 3)) {
+      showToast(`${product.name} added. Hurry — stock is running low!`, 'success');
+    } else {
+      showToast(`${product.name} added to cart.`, 'success');
+    }
     return { success: true, message: 'Added to cart.' };
   };
 
   const updateCartQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) { setCart((prev) => prev.filter((i) => i.product.id !== productId)); return; }
-    setCart((prev) => prev.map((i) => i.product.id === productId ? { ...i, quantity: Math.min(quantity, i.product.stockCount) } : i));
+    const live = products.find((p) => p.id === productId);
+    const stock = live ? live.stockCount : undefined;
+    setCart((prev) => prev.map((i) => i.product.id === productId ? { ...i, quantity: stock !== undefined ? Math.min(quantity, stock) : quantity, isUnavailableInCart: stock !== undefined && stock <= 0 } : i));
   };
   const removeFromCart = (productId: string) => setCart((prev) => prev.filter((i) => i.product.id !== productId));
   const clearCart = () => setCart([]);
