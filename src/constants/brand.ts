@@ -6,5 +6,5 @@ export const BRAND = {
   email: 'al.medina.market90@gmail.com',
   phone: '+251 9 55348181',
   phoneTel: '+251955348181',
-  callHours: '3:00 AM LT – 9:00 PM LT',
+  workingHours: '3:00 AM – 9:00 PM',
 } as const;

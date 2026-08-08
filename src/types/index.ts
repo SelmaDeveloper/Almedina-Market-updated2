@@ -9,6 +9,7 @@ export interface UserProfile {
   name: string;
   email?: string;
   phoneNumber: string;
+  avatar: string;
   isLoggedIn: boolean;
   isEmailVerified: boolean;
   savedAddresses?: {
@@ -56,7 +57,7 @@ export interface Product {
   rating: number;
   reviewCount: number;
   isPopular?: boolean;
-  isSaudiImport: boolean;
+  isImported: boolean;
 }
 
 export interface CartItem {
