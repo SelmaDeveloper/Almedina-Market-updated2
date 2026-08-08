@@ -33,7 +33,7 @@ import { AdminReportsManager } from './components/admin/AdminReportsManager';
 import { Logo } from './components/common/Logo';
 import { BRAND } from './constants/brand';
 import { CategoryId, Product, Order } from './types';
-import { X, Circle as HelpCircle, Info, Mail, Send, Phone, MapPin, Clock, Heart, ListOrdered, Plus, Trash2, Pencil, Check, Minus } from 'lucide-react';
+import { X, Circle as HelpCircle, Info, Mail, Send, Phone, MapPin, Heart, ListOrdered, Plus, Trash2, Pencil, Check, Minus } from 'lucide-react';
 
 // ─── Simple hash-based "router" ──────────────────────────────────────────────
 // Supports: '' | '/' → storefront, '#/admin' or '#/admin/login' → admin login
@@ -260,9 +260,7 @@ const StorefrontContent: React.FC = () => {
               </ul>
             </div>
 
-            <p className="text-base font-medium text-[#1A1A1A] font-serif text-center pt-2">
-              Your kitchen deserves the best — and we deliver it.
-            </p>
+
           </div>
         </section>
 
@@ -324,13 +322,9 @@ const StorefrontContent: React.FC = () => {
           <div className="space-y-2">
             <h3 className="font-bold font-serif text-[#1A1A1A]">Store Location</h3>
             <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0" />{BRAND.location}</p>
-            <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 shrink-0" />Working Hours: {BRAND.workingHours}</p>
-            <a href={`tel:${BRAND.phoneTel}`} className="text-[#1A1A1A]/70 flex items-center gap-1.5 hover:text-emerald-700 transition-colors"><Phone className="w-3.5 h-3.5 shrink-0" />{BRAND.phone}</a>
-            <a href={`https://mail.google.com`} target="_blank" rel="noopener noreferrer" className="text-[#1A1A1A]/70 flex items-center gap-1.5 hover:text-emerald-700 transition-colors break-all"><Mail className="w-3.5 h-3.5 shrink-0" />{BRAND.email}</a>
           </div>
           <div className="space-y-2">
             <h3 className="font-bold font-serif text-[#1A1A1A]">Service Terms</h3>
-            <p className="text-[#1A1A1A]/70 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 shrink-0" />Working Hours: {BRAND.workingHours}</p>
             <p className="text-[#1A1A1A]/70">Max Delivery: 6.0 km</p>
             <p className="text-[#1A1A1A]/70">Min Delivery Subtotal: 1,000 ETB</p>
           </div>
@@ -347,8 +341,21 @@ const StorefrontContent: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto border-t border-[#1A1A1A]/10 mt-8 pt-6 text-center text-[#1A1A1A]/50 text-[11px]">
-          © {new Date().getFullYear()} {BRAND.name} • Bethel, Addis Ababa, Ethiopia.
+        <div className="max-w-7xl mx-auto border-t border-[#1A1A1A]/10 mt-8 pt-6 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-4">
+            <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-emerald-900 flex items-center justify-center text-emerald-100 hover:bg-emerald-700 transition-colors" title="Email us">
+              <Mail className="w-4.5 h-4.5" />
+            </a>
+            <a href="tel:+251955348181" className="w-10 h-10 rounded-full bg-emerald-900 flex items-center justify-center text-emerald-100 hover:bg-emerald-700 transition-colors" title="Call us">
+              <Phone className="w-4.5 h-4.5" />
+            </a>
+            <a href="https://www.tiktok.com/@al.medina.market" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-emerald-900 flex items-center justify-center text-emerald-100 hover:bg-emerald-700 transition-colors" title="Follow on TikTok">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4.5 h-4.5"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.14v12.36a3.21 3.21 0 1 1-2.79-3.18V8.04a6.35 6.35 0 0 0-5.93 6.34 6.35 6.35 0 0 0 6.35 6.35 6.35 6.35 0 0 0 6.35-6.35V8.69a8.32 8.32 0 0 0 4.83 1.54V7.09a4.85 4.85 0 0 1-1.9-.4z"/></svg>
+            </a>
+          </div>
+          <p className="text-center text-[#1A1A1A]/50 text-[11px]">
+            © {new Date().getFullYear()} {BRAND.name} • Bethel, Addis Ababa, Ethiopia.
+          </p>
         </div>
       </footer>
 
@@ -539,7 +546,7 @@ const StorefrontContent: React.FC = () => {
                 <div className="bg-gradient-to-br from-emerald-50 to-white p-5 rounded-xl border border-emerald-200 space-y-2">
                   <h3 className="font-bold text-sm text-emerald-900 font-serif">Our Promise</h3>
                   <p className="text-[#1A1A1A]/80">At {BRAND.name}, nestled in the heart of Bethel, Addis Ababa, we believe grocery shopping should feel personal. That's why every product on our shelves is hand-picked for quality, authenticity, and value — from premium imported dates and aromatic Arabic coffee to everyday cooking essentials your family trusts.</p>
-                  <p className="text-[#1A1A1A]/80">Whether you prefer the convenience of doorstep delivery or a quick in-store pickup, we make it simple, fast, and reliable. <strong>Your kitchen deserves the best — and we deliver it.</strong></p>
+                  <p className="text-[#1A1A1A]/80">Whether you prefer the convenience of doorstep delivery or a quick in-store pickup, we make it simple, fast, and reliable.</p>
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
                   <h3 className="font-bold text-sm text-[#1A1A1A] font-serif">Why Shop With Us?</h3>

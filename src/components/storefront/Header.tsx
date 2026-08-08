@@ -6,8 +6,6 @@ import {
   Heart,
   ListOrdered,
   User,
-  Phone,
-  Clock,
   LogOut,
   ChevronDown,
   PackageCheck,
@@ -84,25 +82,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
-      {/* Top Info Banner */}
-      <div className="bg-emerald-900 text-emerald-100 text-[11px] px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800">
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="hidden sm:flex items-center gap-1 text-emerald-200">
-            <Clock className="w-3 h-3 text-amber-300 shrink-0" />
-            Working Hours: {BRAND.workingHours}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <a
-            href={`tel:${BRAND.phoneTel}`}
-            className="flex items-center gap-1 font-semibold text-emerald-300 hover:text-white transition-colors"
-          >
-            <Phone className="w-3 h-3 shrink-0" />
-            {BRAND.phone}
-          </a>
-        </div>
-      </div>
-
       {/* Main Header Row */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
         {/* Brand */}
