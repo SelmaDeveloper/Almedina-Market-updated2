@@ -10,6 +10,7 @@ import {
   updateProfile,
   sendEmailVerification,
   reload,
+  sendPasswordResetEmail,
   type User,
 } from 'firebase/auth';
 
@@ -35,6 +36,7 @@ export {
   updateProfile,
   sendEmailVerification,
   reload,
+  sendPasswordResetEmail,
   type User,
 };                                                
 

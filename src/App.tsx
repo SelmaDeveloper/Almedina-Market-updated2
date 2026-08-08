@@ -16,6 +16,7 @@ import { ReturnReportModal } from './components/storefront/ReturnReportModal';
 import { ReviewSubmissionModal } from './components/storefront/ReviewSubmissionModal';
 import { AuthModal } from './components/storefront/AuthModal';
 import { ChapaPaymentSimulator } from './components/storefront/ChapaPaymentSimulator';
+import { CustomerDashboardModal } from './components/storefront/CustomerDashboardModal';
 
 // Admin
 import { AdminLoginPage } from './components/admin/AdminLoginPage';
@@ -103,6 +104,7 @@ const StorefrontContent: React.FC = () => {
   const [orderTrackingOpen, setOrderTrackingOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [shoppingListsOpen, setShoppingListsOpen] = useState(false);
+  const [customerDashboardOpen, setCustomerDashboardOpen] = useState(false);
   const [pageModal, setPageModal] = useState<'faq' | 'about' | 'contact' | null>(null);
 
   const [returnModalOpen, setReturnModalOpen] = useState(false);
@@ -117,6 +119,11 @@ const StorefrontContent: React.FC = () => {
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [contactMessage, setContactMessage] = useState('');
+  const [contactFormName, setContactFormName] = useState('');
+  const [contactFormEmail, setContactFormEmail] = useState('');
+  const [contactFormSubject, setContactFormSubject] = useState('');
+  const [contactFormMessage, setContactFormMessage] = useState('');
+  const [contactFormStatus, setContactFormStatus] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -132,6 +139,25 @@ const StorefrontContent: React.FC = () => {
 
   const favoriteProducts = useMemo(() => products.filter((p) => favorites.includes(p.id)), [products, favorites]);
 
+  const handleContactSectionSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactFormName.trim() || !contactFormEmail.trim() || !contactFormSubject.trim() || !contactFormMessage.trim()) {
+      setContactFormStatus('Please fill in all fields before sending your message.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactFormEmail)) {
+      setContactFormStatus('Please enter a valid email address.');
+      return;
+    }
+
+    submitContactForm(contactFormName.trim(), contactFormEmail.trim(), `${contactFormSubject.trim()}\n\n${contactFormMessage.trim()}`);
+    setContactFormName('');
+    setContactFormEmail('');
+    setContactFormSubject('');
+    setContactFormMessage('');
+    setContactFormStatus('Thank you. Your message has been sent.');
+  };
+
   return (
     <div className="flex-1 flex flex-col">
       <Header
@@ -143,6 +169,7 @@ const StorefrontContent: React.FC = () => {
         onOpenFavorites={() => setFavoritesOpen(true)}
         onOpenShoppingLists={() => setShoppingListsOpen(true)}
         onOpenOrderHistory={() => setOrderTrackingOpen(true)}
+        onOpenCustomerDashboard={() => setCustomerDashboardOpen(true)}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
@@ -183,6 +210,85 @@ const StorefrontContent: React.FC = () => {
             </div>
           )}
         </div>
+
+        <section id="about" className="scroll-mt-24 bg-[#FAF8F0] border border-[#1A1A1A]/10 rounded-2xl p-6 sm:p-8 space-y-4">
+          <div className="flex items-center gap-2">
+            <Info className="w-5 h-5 text-emerald-700" />
+            <h2 className="text-xl font-bold font-serif text-[#1A1A1A]">About {BRAND.name}</h2>
+          </div>
+          <div className="space-y-4 text-sm leading-relaxed text-[#1A1A1A]/80">
+            <p className="max-w-3xl">
+              At {BRAND.name}, you can discover the products you need and enjoy the ease of everyday shopping from the comfort of home. Our online marketplace brings together curated products, helpful service, and flexible options, so your routine feels simpler from the first click to the final doorstep.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="bg-white rounded-xl border border-[#1A1A1A]/10 p-4 space-y-2">
+                <h3 className="font-bold text-[#1A1A1A]">Our Purpose</h3>
+                <p>We make quality essentials and everyday favorites easy to find, compare, and order in one place. Whether you need something for the week ahead or a special treat, we help you shop with confidence.</p>
+              </div>
+              <div className="bg-white rounded-xl border border-[#1A1A1A]/10 p-4 space-y-2">
+                <h3 className="font-bold text-[#1A1A1A]">The Customer Experience</h3>
+                <p>Shopping with us feels calm, clear, and convenient. You can browse at your own pace, choose between home delivery or easy pickup, and enjoy a smooth experience that saves time and reduces stress.</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-bold text-[#1A1A1A]">Why Choose {BRAND.name}</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Curated products selected for quality, freshness, and everyday usefulness.</li>
+                <li>Flexible home delivery and easy pickup options that fit your schedule.</li>
+                <li>A simple, straightforward shopping experience that feels easy from start to finish.</li>
+                <li>Reliable service you can count on for your regular errands and special moments.</li>
+              </ul>
+            </div>
+
+            <p className="font-medium text-[#1A1A1A]">Because everyday shopping should feel convenient, dependable, and a little more enjoyable.</p>
+          </div>
+        </section>
+
+        <section id="contact" className="scroll-mt-24 bg-white border border-[#1A1A1A]/10 rounded-2xl p-6 sm:p-8">
+          <div className="mx-auto max-w-2xl space-y-5">
+            <div className="text-center space-y-2">
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#FAF8F0] border border-[#1A1A1A]/10">
+                <Mail className="w-5 h-5 text-emerald-700" />
+              </div>
+              <h2 className="text-xl font-bold font-serif text-[#1A1A1A]">Contact Us</h2>
+              <p className="text-sm text-[#1A1A1A]/70">We are here to help with product questions, delivery support, and general assistance.</p>
+            </div>
+
+            <form onSubmit={handleContactSectionSubmit} className="space-y-3 rounded-2xl border border-[#1A1A1A]/10 bg-[#FAF8F0] p-4 sm:p-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#1A1A1A]/70">Name</label>
+                  <input type="text" value={contactFormName} onChange={(e) => setContactFormName(e.target.value)} className="w-full rounded-xl border border-[#1A1A1A]/10 bg-white px-3 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-emerald-600" placeholder="Your name" />
+                </div>
+                <div>
+                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#1A1A1A]/70">Email</label>
+                  <input type="email" value={contactFormEmail} onChange={(e) => setContactFormEmail(e.target.value)} className="w-full rounded-xl border border-[#1A1A1A]/10 bg-white px-3 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-emerald-600" placeholder="your@email.com" />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#1A1A1A]/70">Subject</label>
+                <input type="text" value={contactFormSubject} onChange={(e) => setContactFormSubject(e.target.value)} className="w-full rounded-xl border border-[#1A1A1A]/10 bg-white px-3 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-emerald-600" placeholder="How can we help?" />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#1A1A1A]/70">Message</label>
+                <textarea rows={4} value={contactFormMessage} onChange={(e) => setContactFormMessage(e.target.value)} className="w-full rounded-xl border border-[#1A1A1A]/10 bg-white px-3 py-2.5 text-sm text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-emerald-600" placeholder="Tell us more about your request" />
+              </div>
+
+              {contactFormStatus && (
+                <p className={`text-xs ${contactFormStatus.includes('Thank you') ? 'text-emerald-700' : 'text-rose-600'}`}>{contactFormStatus}</p>
+              )}
+
+              <button type="submit" className="w-full rounded-xl bg-[#1A1A1A] px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-[#FDFCF5] transition-colors hover:bg-[#333333] flex items-center justify-center gap-2 min-h-[44px]">
+                <Send className="w-4 h-4" />
+                <span>Send Message</span>
+              </button>
+            </form>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
@@ -211,8 +317,8 @@ const StorefrontContent: React.FC = () => {
             <h3 className="font-bold font-serif text-[#1A1A1A]">Help & Support</h3>
             <div className="flex flex-col space-y-2 text-[#1A1A1A]/70">
               <button onClick={() => setPageModal('faq')} className="text-left hover:text-emerald-700 transition-colors flex items-center gap-2"><HelpCircle className="w-3.5 h-3.5 shrink-0" />FAQ</button>
-              <button onClick={() => setPageModal('about')} className="text-left hover:text-emerald-700 transition-colors flex items-center gap-2"><Info className="w-3.5 h-3.5 shrink-0" />Our Promise</button>
-              <button onClick={() => setPageModal('contact')} className="text-left hover:text-emerald-700 transition-colors flex items-center gap-2"><Mail className="w-3.5 h-3.5 shrink-0" />Contact</button>
+              <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="text-left hover:text-emerald-700 transition-colors flex items-center gap-2"><Info className="w-3.5 h-3.5 shrink-0" />About</button>
+              <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-left hover:text-emerald-700 transition-colors flex items-center gap-2"><Mail className="w-3.5 h-3.5 shrink-0" />Contact</button>
               <a href="#/admin" className="flex items-center gap-2 hover:text-amber-700 transition-colors font-medium">
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                 Admin Login
@@ -235,6 +341,7 @@ const StorefrontContent: React.FC = () => {
       )}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} onProceedToCheckout={() => { setCartOpen(false); setCheckoutOpen(true); }} />
       <CheckoutModal isOpen={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+      <CustomerDashboardModal isOpen={customerDashboardOpen} onClose={() => setCustomerDashboardOpen(false)} />
       <OrderTrackingModal
         isOpen={orderTrackingOpen}
         onClose={() => setOrderTrackingOpen(false)}

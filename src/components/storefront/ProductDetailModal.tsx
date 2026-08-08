@@ -54,7 +54,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <p className="text-xs text-slate-600 leading-relaxed">{product.description}</p>
               <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
                 <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-emerald-600" />Origin: <strong className="text-slate-800">{product.origin}</strong></span>
-                <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />Stock: <strong className="text-slate-800">{product.stockCount} units</strong></span>
+                <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />Available: <strong className="text-slate-800">{isOutOfStock ? 'Out of Stock' : 'In Stock'}</strong></span>
               </div>
             </div>
 

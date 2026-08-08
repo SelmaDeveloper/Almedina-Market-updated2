@@ -39,6 +39,7 @@ import {
   updateProfile,
   sendEmailVerification,
   reload,
+  sendPasswordResetEmail,
 } from '../lib/firebase';
 
 // ─── Hardcoded admin UID — set this to your real Firebase UID ─────────────────
@@ -75,9 +76,13 @@ interface AppContextType {
   registerUser: (name: string, email: string, password: string) => Promise<AuthResult>;
   loginUser: (email: string, password: string) => Promise<AuthResult>;
   loginWithGoogle: () => Promise<AuthResult>;
+  sendPasswordReset: (email: string) => Promise<{ success: boolean; message: string }>;
   logoutUser: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   checkEmailVerification: () => Promise<boolean>;
+  updateAccountSettings: (updates: { name?: string; phoneNumber?: string }) => Promise<void>;
+  saveAddress: (address: { label: string; addressText: string; latitude: number; longitude: number; distanceKm: number }) => void;
+  removeAddress: (addressId: string) => void;
 
   // Admin Auth (password + 2FA)
   adminSession: {
@@ -225,15 +230,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (firebaseUser && firebaseUser.emailVerified) {
         // Determine role: if UID matches the configured admin UID → admin
         const isAdmin = ADMIN_UID ? firebaseUser.uid === ADMIN_UID : false;
-        const profile: UserProfile = {
+        setCurrentUser((prev) => ({
+          ...(prev || {}),
           id: firebaseUser.uid,
           name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Customer',
           email: firebaseUser.email || undefined,
-          phoneNumber: firebaseUser.phoneNumber || '',
+          phoneNumber: firebaseUser.phoneNumber || prev?.phoneNumber || '',
           isLoggedIn: true,
           isEmailVerified: true,
-        };
-        setCurrentUser(profile);
+          savedAddresses: prev?.savedAddresses || [],
+        } as UserProfile));
         setUserRole(isAdmin ? 'admin' : 'customer');
         // Clear any lingering pending verification state
         setPendingVerificationEmail(null);
@@ -323,6 +329,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const sendPasswordReset = async (email: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { success: false, message: 'Please enter a valid email address.' };
+      }
+      await sendPasswordResetEmail(auth, email);
+      showToast('Password reset link sent to your email!', 'success');
+      return { success: true, message: 'Password reset link sent to your email!' };
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code || '';
+      const message =
+        code === 'auth/user-not-found'
+          ? 'No account found with this email.'
+          : code === 'auth/invalid-email'
+          ? 'Invalid email address.'
+          : code === 'auth/too-many-requests'
+          ? 'Too many requests. Please try again later.'
+          : 'Failed to send reset link. Please try again.';
+      return { success: false, message };
+    }
+  };
+
   const logoutUser = async (): Promise<void> => {
     await signOut(auth);
     setCurrentUser(null);
@@ -358,6 +386,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     await reload(firebaseUser);
     return firebaseUser.emailVerified;
+  };
+
+  const updateAccountSettings = async (updates: { name?: string; phoneNumber?: string }) => {
+    if (!currentUser) {
+      showToast('Please log in to update account settings.', 'warning');
+      return;
+    }
+
+    setCurrentUser((prev) => (prev ? { ...prev, ...updates } : prev));
+
+    if (auth.currentUser) {
+      try {
+        await updateProfile(auth.currentUser, { displayName: updates.name || auth.currentUser.displayName || currentUser.name });
+      } catch {
+        showToast('Your profile was updated locally. Firebase sync was skipped.', 'warning');
+      }
+    }
+
+    showToast('Account settings updated.', 'success');
+  };
+
+  const saveAddress = (address: { label: string; addressText: string; latitude: number; longitude: number; distanceKm: number }) => {
+    if (!currentUser) {
+      showToast('Please log in to save addresses.', 'warning');
+      return;
+    }
+
+    const nextAddress = {
+      id: 'addr-' + Date.now(),
+      ...address,
+    };
+
+    setCurrentUser((prev) => (prev ? { ...prev, savedAddresses: [...(prev.savedAddresses || []), nextAddress] } : prev));
+    showToast(`Saved address: ${address.label}`, 'success');
+  };
+
+  const removeAddress = (addressId: string) => {
+    setCurrentUser((prev) => (prev ? { ...prev, savedAddresses: (prev.savedAddresses || []).filter((item) => item.id !== addressId) } : prev));
+    showToast('Address removed.', 'info');
   };
 
   // ─── Admin Auth (password + 2FA, separate from Firebase customer auth) ─────
@@ -661,9 +728,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     registerUser,
     loginUser,
     loginWithGoogle,
+    sendPasswordReset,
     logoutUser,
     resendVerificationEmail,
     checkEmailVerification,
+    updateAccountSettings,
+    saveAddress,
+    removeAddress,
     adminSession,
     loginAdmin,
     verifyAdmin2FA,

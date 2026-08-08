@@ -144,11 +144,12 @@ export const AuthModal: React.FC = () => {
     registerUser,
     loginUser,
     loginWithGoogle,
+    sendPasswordReset,
     resendVerificationEmail,
   } = useApp();
 
   const [mode, setMode] = useState<'login' | 'register'>('register');
-  const [screen, setScreen] = useState<'form' | 'verify'>(() =>
+  const [screen, setScreen] = useState<'form' | 'verify' | 'reset'>(() =>
     pendingVerificationEmail ? 'verify' : 'form'
   );
   const [verifyEmail, setVerifyEmail] = useState(pendingVerificationEmail || '');
@@ -161,6 +162,9 @@ export const AuthModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   // Live rule evaluation
   const ruleResults = useMemo(() =>
@@ -236,6 +240,30 @@ export const AuthModal: React.FC = () => {
     setPasswordTouched(false);
   };
 
+  const handleSendReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    if (!resetEmail) {
+      setErrorMessage('Please enter your email address.');
+      return;
+    }
+    setResetLoading(true);
+    const result = await sendPasswordReset(resetEmail);
+    setResetLoading(false);
+    if (result.success) {
+      setResetSent(true);
+      setTimeout(() => {
+        setScreen('form');
+        setMode('login');
+        setEmail(resetEmail);
+        setResetEmail('');
+        setResetSent(false);
+      }, 3000);
+    } else {
+      setErrorMessage(result.message);
+    }
+  };
+
   // ── Verify screen ──────────────────────────────────────────────────────────
   if (screen === 'verify') {
     return (
@@ -260,6 +288,92 @@ export const AuthModal: React.FC = () => {
             }}
             onResend={resendVerificationEmail}
           />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Password Reset screen ──────────────────────────────────────────────────
+  if (screen === 'reset') {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 relative my-4">
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 z-10 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <div className="p-8 space-y-6">
+            <div className="space-y-1">
+              <p className="text-xs font-bold tracking-widest text-slate-400 uppercase">{BRAND.name}</p>
+              <h2 className="text-2xl font-bold text-slate-900">Reset Your Password</h2>
+            </div>
+
+            {resetSent ? (
+              <div className="space-y-4 text-center">
+                <div className="flex justify-center">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <Check className="w-6 h-6 text-emerald-600" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-bold text-slate-900">Check Your Email</p>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    We sent a password reset link to <strong>{resetEmail}</strong>. Click the link to reset your password.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+
+                {errorMessage && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <p className="text-[11px] leading-relaxed">{errorMessage}</p>
+                  </div>
+                )}
+
+                <form onSubmit={handleSendReset} noValidate>
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    autoComplete="email"
+                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 transition-colors mb-4"
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={resetLoading}
+                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white disabled:text-slate-500 font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    {resetLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    <span>Send Reset Link</span>
+                  </button>
+                </form>
+              </div>
+            )}
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setScreen('form');
+                  setResetEmail('');
+                  setResetSent(false);
+                  setErrorMessage(null);
+                }}
+                className="text-emerald-700 font-semibold text-sm hover:underline"
+              >
+                Back to Login
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -367,6 +481,21 @@ export const AuthModal: React.FC = () => {
                       touched={passwordTouched}
                     />
                   ))}
+                </div>
+              )}
+
+              {mode === 'login' && (
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setScreen('reset');
+                      setErrorMessage(null);
+                    }}
+                    className="text-xs text-emerald-700 font-semibold hover:underline"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
               )}
             </div>

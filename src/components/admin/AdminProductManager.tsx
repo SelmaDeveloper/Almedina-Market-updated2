@@ -31,6 +31,7 @@ export const AdminProductManager: React.FC = () => {
   const [stockCount, setStockCount] = useState<number>(20);
   const [lowStockThreshold, setLowStockThreshold] = useState<number>(5);
   const [isSaudiImport, setIsSaudiImport] = useState(true);
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<CategoryId | 'all'>('all');
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -67,6 +68,10 @@ export const AdminProductManager: React.FC = () => {
     setErrorMessage(null);
     setModalOpen(true);
   };
+
+  const filteredProducts = selectedCategoryFilter === 'all'
+    ? products
+    : products.filter((p) => p.categoryId === selectedCategoryFilter);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,6 +143,26 @@ export const AdminProductManager: React.FC = () => {
         </button>
       </div>
 
+      {/* Category Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Filter by Category</p>
+          <p className="text-xs text-slate-500">Focus on one product group at a time.</p>
+        </div>
+        <select
+          value={selectedCategoryFilter}
+          onChange={(e) => setSelectedCategoryFilter(e.target.value as CategoryId | 'all')}
+          className="w-full sm:w-56 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-900"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Product List Table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden text-xs">
         <div className="overflow-x-auto">
@@ -153,7 +178,7 @@ export const AdminProductManager: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {products.map((p) => {
+              {filteredProducts.map((p) => {
                 const isLowStock = p.stockCount <= p.lowStockThreshold && p.stockCount > 0;
                 const isOutOfStock = p.stockCount <= 0 || !p.isAvailable;
                 const catName = categories.find((c) => c.id === p.categoryId)?.name || p.categoryId;
@@ -190,14 +215,14 @@ export const AdminProductManager: React.FC = () => {
                         }`}
                       >
                         {isOutOfStock ? (
-                          'OUT OF STOCK (0)'
+                          'Out of Stock'
                         ) : isLowStock ? (
                           <>
                             <AlertTriangle className="w-3 h-3 text-amber-600" />
-                            LOW STOCK ({p.stockCount})
+                            Low Stock
                           </>
                         ) : (
-                          `IN STOCK (${p.stockCount})`
+                          'In Stock'
                         )}
                       </span>
                     </td>

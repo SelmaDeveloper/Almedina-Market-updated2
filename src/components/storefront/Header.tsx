@@ -28,6 +28,7 @@ interface HeaderProps {
   onOpenFavorites: () => void;
   onOpenShoppingLists: () => void;
   onOpenOrderHistory: () => void;
+  onOpenCustomerDashboard: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -39,6 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenFavorites,
   onOpenShoppingLists,
   onOpenOrderHistory,
+  onOpenCustomerDashboard,
 }) => {
   const {
     userRole,
@@ -235,6 +237,13 @@ export const Header: React.FC<HeaderProps> = ({
                       <p className="text-[11px] text-slate-500 truncate">{currentUser?.email || currentUser?.phoneNumber}</p>
                     </div>
                     <button
+                      onClick={() => { setUserMenuOpen(false); onOpenCustomerDashboard(); }}
+                      className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-emerald-600" />
+                      Customer Dashboard
+                    </button>
+                    <button
                       onClick={() => { setUserMenuOpen(false); onOpenOrderHistory(); }}
                       className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
                     >
@@ -308,6 +317,14 @@ export const Header: React.FC<HeaderProps> = ({
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200 bg-white shadow-lg">
           <nav className="px-4 py-3 space-y-1">
+            <button
+              onClick={() => { setMobileMenuOpen(false); onOpenCustomerDashboard(); }}
+              className="w-full flex items-center gap-3 px-3 py-3 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-colors"
+            >
+              <User className="w-5 h-5 text-emerald-600" />
+              <span className="font-semibold">Customer Dashboard</span>
+            </button>
+
             <button
               onClick={() => { setMobileMenuOpen(false); onOpenOrderHistory(); }}
               className="w-full flex items-center gap-3 px-3 py-3 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition-colors"
