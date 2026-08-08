@@ -81,9 +81,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold">Cart Stock Conflict</p>
+                    <p className="font-bold">Stock Update</p>
                     <p className="text-[11px] text-rose-700">
-                      Some items are no longer available in the requested quantity. Please adjust quantities.
+                      An item in your cart just went out of stock or the available quantity changed. Please remove it or adjust the quantity to continue.
                     </p>
                   </div>
                 </div>
@@ -192,8 +192,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <span className="font-semibold text-slate-900">{formatETB(subtotal)}</span>
               </div>
               <div className="flex justify-between text-slate-500 text-[11px]">
-                <span>Delivery Fee (Calculated at Checkout)</span>
-                <span>50 ETB base + 15 ETB/km</span>
+                <span>Delivery Fee</span>
+                <span>Calculated at checkout</span>
               </div>
               <div className="flex justify-between text-slate-500 text-[11px]">
                 <span>Shop Pickup</span>

@@ -211,38 +211,58 @@ const StorefrontContent: React.FC = () => {
           )}
         </div>
 
-        <section id="about" className="scroll-mt-24 bg-[#FAF8F0] border border-[#1A1A1A]/10 rounded-2xl p-6 sm:p-8 space-y-4">
+        <section id="about" className="scroll-mt-24 bg-gradient-to-br from-[#FAF8F0] to-white border border-[#1A1A1A]/10 rounded-2xl p-6 sm:p-10 space-y-6">
           <div className="flex items-center gap-2">
             <Info className="w-5 h-5 text-emerald-700" />
-            <h2 className="text-xl font-bold font-serif text-[#1A1A1A]">About {BRAND.name}</h2>
+            <h2 className="text-2xl font-bold font-serif text-[#1A1A1A]">About {BRAND.name}</h2>
           </div>
-          <div className="space-y-4 text-sm leading-relaxed text-[#1A1A1A]/80">
-            <p className="max-w-3xl">
-              At {BRAND.name}, you can discover the products you need and enjoy the ease of everyday shopping from the comfort of home. Our online marketplace brings together curated products, helpful service, and flexible options, so your routine feels simpler from the first click to the final doorstep.
-            </p>
+          <div className="space-y-6 text-sm leading-relaxed text-[#1A1A1A]/80">
+            <div className="space-y-3">
+              <p className="text-base max-w-3xl">
+                Tucked along Bethel Main Road in the heart of Addis Ababa, {BRAND.name} is your neighborhood grocery destination for <strong>premium imported and everyday essentials</strong>. From authentic Ajwa dates and aromatic Arabic coffee to trusted cooking oils and dairy staples, every product on our shelf is hand-picked for quality and freshness.
+              </p>
+              <p className="max-w-3xl">
+                Whether you prefer the convenience of <strong>doorstep delivery</strong> within 6 km or a quick <strong>in-store pickup</strong>, we make grocery shopping simple, fast, and reliable — so you can spend less time running errands and more time enjoying what matters.
+              </p>
+            </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="bg-white rounded-xl border border-[#1A1A1A]/10 p-4 space-y-2">
-                <h3 className="font-bold text-[#1A1A1A]">Our Purpose</h3>
-                <p>We make quality essentials and everyday favorites easy to find, compare, and order in one place. Whether you need something for the week ahead or a special treat, we help you shop with confidence.</p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="bg-white rounded-xl border border-emerald-200/60 p-5 space-y-2 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <Heart className="w-5 h-5 text-emerald-700" />
+                </div>
+                <h3 className="font-bold text-[#1A1A1A]">Hand-Picked Quality</h3>
+                <p>Every item is personally selected to meet our quality bar — from premium imported dates to your daily cooking essentials.</p>
               </div>
-              <div className="bg-white rounded-xl border border-[#1A1A1A]/10 p-4 space-y-2">
-                <h3 className="font-bold text-[#1A1A1A]">The Customer Experience</h3>
-                <p>Shopping with us feels calm, clear, and convenient. You can browse at your own pace, choose between home delivery or easy pickup, and enjoy a smooth experience that saves time and reduces stress.</p>
+              <div className="bg-white rounded-xl border border-emerald-200/60 p-5 space-y-2 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <ListOrdered className="w-5 h-5 text-emerald-700" />
+                </div>
+                <h3 className="font-bold text-[#1A1A1A]">Flexible Fulfillment</h3>
+                <p>Choose doorstep delivery within 6 km or free in-store pickup at our Bethel location — whatever fits your day best.</p>
+              </div>
+              <div className="bg-white rounded-xl border border-emerald-200/60 p-5 space-y-2 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <Check className="w-5 h-5 text-emerald-700" />
+                </div>
+                <h3 className="font-bold text-[#1A1A1A]">Same-Day Returns</h3>
+                <p>Not satisfied? Report it the same day with photo evidence and we'll make it right — refund or replacement, hassle-free.</p>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <h3 className="font-bold text-[#1A1A1A]">Why Choose {BRAND.name}</h3>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Curated products selected for quality, freshness, and everyday usefulness.</li>
-                <li>Flexible home delivery and easy pickup options that fit your schedule.</li>
-                <li>A simple, straightforward shopping experience that feels easy from start to finish.</li>
-                <li>Reliable service you can count on for your regular errands and special moments.</li>
+            <div className="bg-white rounded-xl border border-[#1A1A1A]/10 p-5 space-y-3">
+              <h3 className="font-bold text-[#1A1A1A] font-serif">Why Shop With {BRAND.name}?</h3>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" /><span><strong>Curated selection</strong> — quality you can taste and trust.</span></li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" /><span><strong>Transparent pricing</strong> — what you see is what you pay.</span></li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" /><span><strong>Fast delivery</strong> — straight from Bethel to your door.</span></li>
+                <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" /><span><strong>Real-time stock</strong> — know what's available before you order.</span></li>
               </ul>
             </div>
 
-            <p className="font-medium text-[#1A1A1A]">Because everyday shopping should feel convenient, dependable, and a little more enjoyable.</p>
+            <p className="text-base font-medium text-[#1A1A1A] font-serif text-center pt-2">
+              Your kitchen deserves the best — and we deliver it.
+            </p>
           </div>
         </section>
 

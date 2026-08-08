@@ -1,169 +1,118 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { formatETB, formatDate } from '../../utils/distance';
-import { X, UserCircle2, MapPin, Heart, PackageCheck, Settings, Plus, Trash2, Save, Star } from 'lucide-react';
+import { X, Settings as SettingsIcon, Check } from 'lucide-react';
 
 interface CustomerDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const AVATAR_OPTIONS = [
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Maria&backgroundColor=c0aede',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Leo&backgroundColor=ffd5dc',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Sara&backgroundColor=b6e3f4',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Omar&backgroundColor=d1f7c4',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Lily&backgroundColor=ffdfbf',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Sam&backgroundColor=c4f0e0',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Nia&backgroundColor=ede0a6',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Khalid&backgroundColor=c0aede',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Maya&backgroundColor=ffd5dc',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Jaden&backgroundColor=b6e3f4',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Amal&backgroundColor=d1f7c4',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=Selam&backgroundColor=ffdfbf',
+];
+
 export const CustomerDashboardModal: React.FC<CustomerDashboardModalProps> = ({ isOpen, onClose }) => {
-  const {
-    currentUser,
-    orders,
-    favorites,
-    products,
-    toggleFavorite,
-    updateAccountSettings,
-    saveAddress,
-    removeAddress,
-  } = useApp();
-
-  const [name, setName] = useState(currentUser?.name || '');
+  const { currentUser, updateAccountSettings } = useApp();
   const [phoneNumber, setPhoneNumber] = useState(currentUser?.phoneNumber || '');
-  const [addressLabel, setAddressLabel] = useState('Home');
-  const [addressText, setAddressText] = useState('');
-  const [landmark, setLandmark] = useState('');
-  const [addressDistance, setAddressDistance] = useState('2.5');
-
-  const customerOrders = useMemo(() => orders.filter((order) => order.userId === currentUser?.id), [orders, currentUser?.id]);
-  const favoriteProducts = useMemo(() => products.filter((product) => favorites.includes(product.id)), [products, favorites]);
+  const [selectedAvatar, setSelectedAvatar] = useState(currentUser?.avatar || AVATAR_OPTIONS[0]);
 
   if (!isOpen) return null;
 
-  const handleSaveProfile = async () => {
-    await updateAccountSettings({ name: name.trim(), phoneNumber: phoneNumber.trim() });
-  };
-
-  const handleSaveNewAddress = () => {
-    if (!addressText.trim()) return;
-    saveAddress({
-      label: addressLabel.trim() || 'Saved address',
-      addressText: addressText.trim(),
-      latitude: 8.98,
-      longitude: 38.71,
-      distanceKm: Number(addressDistance) || 2.5,
-    });
-    setAddressText('');
-    setLandmark('');
-    setAddressDistance('2.5');
-    setAddressLabel('Home');
+  const handleSave = async () => {
+    await updateAccountSettings({ phoneNumber: phoneNumber.trim(), avatar: selectedAvatar });
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 my-4 animate-fade-in flex flex-col max-h-[90vh]">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 animate-fade-in flex flex-col max-h-[90vh]">
         <div className="p-4 bg-emerald-950 text-white flex items-center justify-between border-b border-emerald-800 shrink-0">
-          <div>
-            <h2 className="font-bold text-base flex items-center gap-2">
-              <UserCircle2 className="w-5 h-5 text-emerald-400" />Customer Dashboard
-            </h2>
-            <p className="text-xs text-emerald-300">Manage orders, addresses, favourites, and profile details</p>
+          <div className="flex items-center gap-2">
+            <SettingsIcon className="w-5 h-5 text-emerald-400" />
+            <div>
+              <h2 className="font-bold text-base">Settings</h2>
+              <p className="text-xs text-emerald-300">Update your phone number and avatar</p>
+            </div>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-5 overflow-y-auto space-y-5 flex-1">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <Settings className="w-4 h-4 text-emerald-600" />Account Settings
-              </div>
-              <div className="space-y-2 text-xs">
-                <label className="block text-slate-600">Full name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900" />
-                <label className="block text-slate-600">Phone number</label>
-                <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900" />
-                <button onClick={handleSaveProfile} className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg py-2 font-semibold">Save Settings</button>
+        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          {/* Avatar selection */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <img
+                src={selectedAvatar}
+                alt="Your avatar"
+                className="w-16 h-16 rounded-full border-2 border-emerald-600 bg-emerald-50 object-cover"
+              />
+              <div>
+                <p className="text-sm font-bold text-slate-900">{currentUser?.name || 'Shopper'}</p>
+                <p className="text-xs text-slate-500">Choose your avatar below</p>
               </div>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 lg:col-span-2">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <MapPin className="w-4 h-4 text-emerald-600" />Saved Addresses
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-3">
-                  <input value={addressLabel} onChange={(e) => setAddressLabel(e.target.value)} placeholder="Label" className="w-full rounded-lg border border-slate-300 px-2 py-2 text-xs" />
-                  <input value={addressText} onChange={(e) => setAddressText(e.target.value)} placeholder="Street / area / house number" className="w-full rounded-lg border border-slate-300 px-2 py-2 text-xs" />
-                  <input value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="Landmark (optional)" className="w-full rounded-lg border border-slate-300 px-2 py-2 text-xs" />
-                  <input value={addressDistance} onChange={(e) => setAddressDistance(e.target.value)} placeholder="Distance km" className="w-full rounded-lg border border-slate-300 px-2 py-2 text-xs" />
-                  <button onClick={handleSaveNewAddress} className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg py-2 text-xs font-semibold">
-                    <Plus className="w-3.5 h-3.5" />Save Address
-                  </button>
-                </div>
-
-                <div className="space-y-2">
-                  {(currentUser?.savedAddresses || []).length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-slate-300 p-3 text-xs text-slate-500">No saved addresses yet.</div>
-                  ) : (
-                    (currentUser?.savedAddresses || []).map((address) => (
-                      <div key={address.id} className="rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-700 flex items-start justify-between gap-2">
-                        <div>
-                          <p className="font-bold text-slate-900">{address.label}</p>
-                          <p>{address.addressText}</p>
-                          <p className="text-slate-500">{address.distanceKm} km • {address.latitude.toFixed(3)}, {address.longitude.toFixed(3)}</p>
-                        </div>
-                        <button onClick={() => removeAddress(address.id)} className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))
+            <div className="grid grid-cols-6 gap-2">
+              {AVATAR_OPTIONS.map((avatar) => (
+                <button
+                  key={avatar}
+                  onClick={() => setSelectedAvatar(avatar)}
+                  className={`relative rounded-full overflow-hidden border-2 transition-all ${
+                    selectedAvatar === avatar
+                      ? 'border-emerald-600 ring-2 ring-emerald-300'
+                      : 'border-slate-200 hover:border-emerald-400'
+                  }`}
+                >
+                  <img src={avatar} alt="avatar option" className="w-full aspect-square object-cover bg-emerald-50" />
+                  {selectedAvatar === avatar && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-emerald-600/30">
+                      <Check className="w-4 h-4 text-white drop-shadow" />
+                    </span>
                   )}
-                </div>
-              </div>
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <PackageCheck className="w-4 h-4 text-emerald-600" />Order History
-              </div>
-              {customerOrders.length === 0 ? (
-                <div className="text-xs text-slate-500">No orders yet. Start shopping to see your history here.</div>
-              ) : (
-                <div className="space-y-2">
-                  {customerOrders.map((order) => (
-                    <div key={order.id} className="rounded-lg border border-slate-200 bg-white p-3 text-xs">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-bold text-slate-900">{order.orderNumber}</span>
-                        <span className="text-emerald-700 font-bold">{formatETB(order.totalETB)}</span>
-                      </div>
-                      <p className="text-slate-500 mt-1">{formatDate(order.createdAt)} • {order.fulfillmentType}</p>
-                      <p className="text-slate-500">Status: {order.orderStatus}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+          {/* Phone number */}
+          <div className="space-y-2">
+            <label className="block text-sm font-bold text-slate-800">Phone Number (ET)</label>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-2.5 rounded-lg bg-slate-100 border border-slate-300 text-sm font-bold text-slate-600 shrink-0">
+                +251
+              </span>
+              <input
+                type="tel"
+                value={phoneNumber.replace(/^\+251/, '')}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                  setPhoneNumber(digits ? `+251${digits}` : '');
+                }}
+                placeholder="911223344"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
             </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <Heart className="w-4 h-4 text-amber-500" />Favorite Products
-              </div>
-              {favoriteProducts.length === 0 ? (
-                <div className="text-xs text-slate-500">Save products you love from the catalog.</div>
-              ) : (
-                <div className="space-y-2">
-                  {favoriteProducts.map((product) => (
-                    <div key={product.id} className="rounded-lg border border-slate-200 bg-white p-3 flex items-center justify-between gap-2 text-xs">
-                      <div>
-                        <p className="font-bold text-slate-900">{product.name}</p>
-                        <p className="text-slate-500">{formatETB(product.priceETB)}</p>
-                      </div>
-                      <button onClick={() => toggleFavorite(product.id)} className="flex items-center gap-1 rounded-lg bg-amber-50 px-2 py-1 text-amber-700 font-semibold">
-                        <Star className="w-3.5 h-3.5 fill-current" />Saved
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <p className="text-[11px] text-slate-500">Enter your Ethiopian phone number without the country code.</p>
           </div>
+
+          <button
+            onClick={handleSave}
+            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl py-3 font-bold transition-colors shadow-md"
+          >
+            Save Settings
+          </button>
         </div>
       </div>
     </div>

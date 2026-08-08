@@ -210,7 +210,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 </div>
                 <div className="mt-2">
                   <p className="font-bold text-xs">Delivery</p>
-                  <p className="text-[11px] text-slate-500">Min 1,000 ETB • Distance Fee</p>
+                  <p className="text-[11px] text-slate-500">Min 1,000 ETB • Calculated at checkout</p>
                 </div>
               </button>
             </div>

@@ -80,7 +80,7 @@ interface AppContextType {
   logoutUser: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   checkEmailVerification: () => Promise<boolean>;
-  updateAccountSettings: (updates: { name?: string; phoneNumber?: string }) => Promise<void>;
+  updateAccountSettings: (updates: { name?: string; phoneNumber?: string; avatar?: string }) => Promise<void>;
   saveAddress: (address: { label: string; addressText: string; latitude: number; longitude: number; distanceKm: number }) => void;
   removeAddress: (addressId: string) => void;
 

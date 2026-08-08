@@ -42,36 +42,30 @@ export const DesignSpecsView: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. Delivery Fee & Order Minimum */}
+        {/* 2. Minimum Order Rules */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
           <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
             <Calculator className="w-5 h-5 text-emerald-600" />
-            <h3>2. Delivery Fee & Minimum Order Rules</h3>
+            <h3>2. Minimum Order & Pickup Rules</h3>
           </div>
           <ul className="space-y-2 text-slate-600 list-disc pl-4">
             <li>
-              <strong>Base Fee:</strong> 50 ETB fixed base charge.
+              <strong>Minimum Subtotal for Delivery:</strong> 1,000 ETB. Orders below this subtotal block checkout and display amount deficit alerts.
             </li>
             <li>
-              <strong>Distance Charge:</strong> 15 ETB per kilometer (calculated continuously from store coordinates).
-            </li>
-            <li>
-              <strong>Minimum Subtotal for Delivery:</strong> 1,000 ETB. Orders below this subtotal block checkout and display distance/amount deficit alerts.
-            </li>
-            <li>
-              <strong>Pickup Orders:</strong> Free delivery fee; no minimum subtotal threshold.
+              <strong>Pickup Orders:</strong> Free pickup; no minimum subtotal threshold.
             </li>
           </ul>
         </div>
 
-        {/* 3. Confirmation Call Window */}
+        {/* 3. Working Hours */}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
           <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
             <PhoneCall className="w-5 h-5 text-amber-600" />
-            <h3>3. Confirmation Call Operating Window</h3>
+            <h3>3. Working Hours</h3>
           </div>
           <p className="text-slate-600 leading-relaxed">
-            Store owner initiates phone calls to customers between <strong>3:00 AM – 9:00 PM local time</strong> prior to preparing orders. Orders placed outside this window remain in <strong>Pending Confirmation</strong> status.
+            Store operates daily from <strong>3:00 AM – 9:00 PM local time</strong>. Orders placed outside this window remain in <strong>Pending Confirmation</strong> status until the store reopens.
           </p>
         </div>
 
