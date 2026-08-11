@@ -41,6 +41,22 @@ import {
   reload,
   sendPasswordResetEmail,
 } from '../lib/firebase';
+import { fetchAllData } from '../lib/supabaseApi';
+import {
+  insertProductToSupabase,
+  updateProductInSupabase,
+  deleteProductFromSupabase,
+  insertOrderToSupabase,
+  updateOrderInSupabase,
+  updateOrderItemsInSupabase,
+  insertReviewToSupabase,
+  updateReviewInSupabase,
+  insertReturnReportToSupabase,
+  updateReturnReportInSupabase,
+  insertContactToSupabase,
+  markContactReadInSupabase,
+  upsertFAQsToSupabase,
+} from '../lib/supabaseApi';
 
 // ─── Hardcoded admin UID — set this to your real Firebase UID ─────────────────
 // To get it: sign in with your admin account and copy auth.currentUser.uid
@@ -200,7 +216,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     sessionError: undefined as string | undefined,
   });
 
-  const [categories] = useState(INITIAL_CATEGORIES);
+  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [products, setProducts] = useState(INITIAL_PRODUCTS);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -211,6 +227,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [contactSubmissions, setContactSubmissions] = useState(INITIAL_CONTACTS);
   const [faqs, setFaqs] = useState(INITIAL_FAQS);
   const [pendingChapaOrder, setPendingChapaOrder] = useState<Order | null>(null);
+
+  // ─── Load data from Supabase on mount ──────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await fetchAllData();
+        if (cancelled) return;
+        if (data.categories.length) setCategories(data.categories);
+        if (data.products.length) setProducts(data.products);
+        if (data.orders.length) setOrders(data.orders);
+        if (data.reviews.length) setReviews(data.reviews);
+        if (data.returnReports.length) setReturnReports(data.returnReports);
+        if (data.contactSubmissions.length) setContactSubmissions(data.contactSubmissions);
+        if (data.faqs.length) setFaqs(data.faqs);
+      } catch (err) {
+        console.warn('Supabase load failed, using mock data:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authRedirectMessage, setAuthRedirectMessage] = useState<string | null>(null);
@@ -475,11 +512,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addProduct = (prodData: Omit<Product, 'id' | 'rating' | 'reviewCount'>) => {
     const p: Product = { ...prodData, id: 'prod-' + Date.now(), rating: 5.0, reviewCount: 0 };
     setProducts((prev) => [p, ...prev]);
+    insertProductToSupabase(p).catch((e) => console.warn('Supabase product insert failed:', e));
     showToast(`Product added: ${p.name}`, 'success');
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
     setProducts((prev) => prev.map((p) => p.id === id ? { ...p, ...updates, isAvailable: updates.stockCount !== undefined ? updates.stockCount > 0 : p.isAvailable } : p));
+    updateProductInSupabase(id, updates).catch((e) => console.warn('Supabase product update failed:', e));
     // If stock dropped to 0, flag any cart items holding this product as unavailable
     if (updates.stockCount !== undefined && updates.stockCount <= 0) {
       setCart((prev) => prev.map((i) => i.product.id === id ? { ...i, isUnavailableInCart: true } : i));
@@ -493,6 +532,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteProduct = (id: string) => {
     const p = products.find((p) => p.id === id);
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    deleteProductFromSupabase(id).catch((e) => console.warn('Supabase product delete failed:', e));
     if (p) showToast(`Product deleted: ${p.name}`, 'warning');
   };
 
@@ -625,6 +665,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       notes: data.notes,
     };
     setOrders((prev) => [newOrder, ...prev]);
+    insertOrderToSupabase(newOrder).catch((e) => console.warn('Supabase order insert failed:', e));
     clearCart();
     if (isChapa) { setPendingChapaOrder(newOrder); showToast('Redirecting to Chapa payment portal...', 'info'); return { success: true, orderId: newOrder.id, message: 'Order created.', requiresChapaRedirect: true }; }
     showToast(`Order ${newOrder.orderNumber} placed! Confirmation email sent.`, 'success');
@@ -654,12 +695,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const o = orders.find((o) => o.id === orderId);
     if (!o || !['pending', 'confirmed'].includes(o.orderStatus)) { showToast('Order cannot be cancelled at this stage.', 'error'); return false; }
     setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, orderStatus: 'cancelled', updatedAt: new Date().toISOString() } : o));
+    updateOrderInSupabase(orderId, { orderStatus: 'cancelled' }).catch((e) => console.warn('Supabase order update failed:', e));
     showToast(`Order ${o.orderNumber} cancelled.`, 'warning');
     return true;
   };
 
   const updateOrderStatus = (orderId: string, status: Order['orderStatus']) => {
     setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, orderStatus: status, updatedAt: new Date().toISOString() } : o));
+    updateOrderInSupabase(orderId, { orderStatus: status }).catch((e) => console.warn('Supabase order update failed:', e));
     if (status === 'out_for_delivery') {
       showToast('Your order is on the way.', 'info');
     } else {
@@ -672,12 +715,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!o) return { success: false, message: 'Order not found.' };
     if (o.paymentStatus === 'paid') return { success: true, message: 'Already paid.' };
     setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, paymentStatus: 'paid', orderStatus: 'confirmed', updatedAt: new Date().toISOString() } : o));
+    updateOrderInSupabase(orderId, { paymentStatus: 'paid', orderStatus: 'confirmed' }).catch((e) => console.warn('Supabase order update failed:', e));
     showToast(`Payment verified for ${o.orderNumber}.`, 'success');
     return { success: true, message: 'Payment verified.' };
   };
 
   const recordCashPaymentReceived = (orderId: string) => {
     setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, paymentStatus: 'paid', updatedAt: new Date().toISOString() } : o));
+    updateOrderInSupabase(orderId, { paymentStatus: 'paid' }).catch((e) => console.warn('Supabase order update failed:', e));
     showToast('Your payment has been received.', 'success');
   };
 
@@ -685,6 +730,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const o = orders.find((o) => o.id === orderId);
     if (!o) return;
     setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, orderStatus: 'confirmed', updatedAt: new Date().toISOString() } : o));
+    updateOrderInSupabase(orderId, { orderStatus: 'confirmed' }).catch((e) => console.warn('Supabase order update failed:', e));
     if (o.fulfillmentType === 'pickup') {
       showToast('Your order has been confirmed and is being prepared.', 'success');
     } else {
@@ -705,13 +751,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const o = orders.find((o) => o.id === orderId);
     if (!o || o.userId !== currentUser.id || o.orderStatus !== 'completed') return { success: false, message: 'Verified completed order required.' };
     if (reviews.find((r) => r.productId === productId && r.orderId === orderId)) return { success: false, message: 'Already reviewed.' };
-    setReviews((prev) => [...prev, { id: 'rev-' + Date.now(), productId, orderId, userId: currentUser.id, userName: currentUser.name, rating, comment, createdAt: new Date().toISOString(), status: 'pending_approval' }]);
+    const newReview: Review = { id: 'rev-' + Date.now(), productId, orderId, userId: currentUser.id, userName: currentUser.name, rating, comment, createdAt: new Date().toISOString(), status: 'pending_approval' };
+    setReviews((prev) => [...prev, newReview]);
+    insertReviewToSupabase(newReview).catch((e) => console.warn('Supabase review insert failed:', e));
     showToast('Review submitted — pending admin approval.', 'success');
     return { success: true, message: 'Submitted.' };
   };
 
   const moderateReview = (reviewId: string, status: 'approved' | 'rejected') => {
     setReviews((prev) => prev.map((r) => r.id === reviewId ? { ...r, status } : r));
+    updateReviewInSupabase(reviewId, status).catch((e) => console.warn('Supabase review update failed:', e));
     showToast(`Review ${status}.`, status === 'approved' ? 'success' : 'warning');
   };
 
@@ -724,23 +773,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!isSameCalendarDay(o.updatedAt)) return { success: false, message: 'Same-day return policy: must be filed on delivery date.' };
     if (!data.photoUrl) return { success: false, message: 'Photo evidence required.' };
     if (returnReports.find((r) => r.orderId === data.orderId)) return { success: false, message: 'Report already filed for this order.' };
-    setReturnReports((prev) => [...prev, { id: 'ret-' + Date.now(), orderId: data.orderId, orderNumber: o.orderNumber, userId: currentUser.id, userName: currentUser.name, userPhone: currentUser.phoneNumber || '', reason: data.reason, photoUrl: data.photoUrl, notes: data.notes, createdAt: new Date().toISOString(), status: 'pending_review' }]);
+    const newReport: ReturnReport = { id: 'ret-' + Date.now(), orderId: data.orderId, orderNumber: o.orderNumber, userId: currentUser.id, userName: currentUser.name, userPhone: currentUser.phoneNumber || '', reason: data.reason, photoUrl: data.photoUrl, notes: data.notes, createdAt: new Date().toISOString(), status: 'pending_review' };
+    setReturnReports((prev) => [...prev, newReport]);
+    insertReturnReportToSupabase(newReport).catch((e) => console.warn('Supabase return insert failed:', e));
     showToast('Return report filed.', 'success');
     return { success: true, message: 'Report submitted.' };
   };
 
   const resolveReturnReport = (reportId: string, resolution: 'refund' | 'replacement' | 'denied', notes?: string) => {
-    setReturnReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: resolution === 'denied' ? 'rejected' : 'approved', adminResolution: resolution, adminResponseNotes: notes } : r));
+    const newStatus = resolution === 'denied' ? 'rejected' : 'approved';
+    setReturnReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, adminResolution: resolution, adminResponseNotes: notes } : r));
+    updateReturnReportInSupabase(reportId, newStatus, resolution, notes).catch((e) => console.warn('Supabase return update failed:', e));
     showToast(`Return ${resolution}.`, 'success');
   };
 
   // ─── Contact & FAQ ─────────────────────────────────────────────────────────
   const submitContactForm = (name: string, phone: string, message: string) => {
-    setContactSubmissions((prev) => [...prev, { id: 'cnt-' + Date.now(), name, phone, message, createdAt: new Date().toISOString(), isRead: false }]);
+    const newContact: ContactSubmission = { id: 'cnt-' + Date.now(), name, phone, message, createdAt: new Date().toISOString(), isRead: false };
+    setContactSubmissions((prev) => [...prev, newContact]);
+    insertContactToSupabase(newContact).catch((e) => console.warn('Supabase contact insert failed:', e));
     showToast('Message sent to Almedina Market.', 'success');
   };
-  const markContactRead = (id: string) => setContactSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, isRead: true } : s));
-  const updateFAQ = (updatedFaqs: FAQItem[]) => { setFaqs(updatedFaqs); showToast('FAQs updated.', 'success'); };
+  const markContactRead = (id: string) => { setContactSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, isRead: true } : s)); markContactReadInSupabase(id).catch((e) => console.warn('Supabase contact update failed:', e)); };
+  const updateFAQ = (updatedFaqs: FAQItem[]) => { setFaqs(updatedFaqs); upsertFAQsToSupabase(updatedFaqs).catch((e) => console.warn('Supabase FAQ upsert failed:', e)); showToast('FAQs updated.', 'success'); };
 
   const contextValue: AppContextType = {
     userRole,
